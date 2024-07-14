@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Pulsa dan Paket Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding-top: 30px;
+            min-height: 70px;
+            border-bottom: #0779e4 3px solid;
+        }
+        header a {
+            color: #fff;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 16px;
+        }
+        header ul {
+            padding: 0;
+            list-style: none;
+        }
+        header li {
+            float: left;
+            display: inline;
+            padding: 0 20px 0 20px;
+        }
+        header #branding {
+            float: left;
+        }
+        header #branding h1 {
+            margin: 0;
+        }
+        header nav {
+            float: right;
+            margin-top: 10px;
+        }
+        #main {
+            padding: 20px;
+            background: #fff;
+            margin-top: -5px;
+            border-top: #0779e4 3px solid;
+        }
+        .form-container {
+            width: 50%;
+            margin: 0 auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .form-group button {
+            width: 100%;
+            padding: 10px;
+            background-color: #0779e4;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        footer {
+            padding: 20px;
+            margin-top: 20px;
+            color: #fff;
+            background-color: #333;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div id="branding">
+                <h1>Dashboard Pulsa dan Paket Data</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Pulsa</a></li>
+                    <li><a href="#">Paket Data</a></li>
+                    <li><a href="#">Kontak</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section id="main">
+        <div class="container">
+            <div class="form-container">
+                <form id="pulsaForm">
+                    <div class="form-group">
+                        <label for="phone">Nomor HP:</label>
+                        <input type="text" id="phone" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product">Pilih Produk:</label>
+                        <select id="product" name="product" required>
+                            <option value="">Loading...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit">Beli Pulsa</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>Dashboard Pulsa dan Paket Data &copy; 2024</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ambil daftar produk dari API dan isi dropdown
+            fetch('/api/produk')
+                .then(response => response.json())
+                .then(data => {
+                    const productSelect = document.getElementById('product');
+                    productSelect.innerHTML = ''; // Kosongkan isi dropdown
+
+                    data.produk.forEach(product => {
+                        const option = document.createElement('option');
+                        option.value = product.kode;
+                        option.text = product.nama;
+                        productSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching products:', error);
+                    const productSelect = document.getElementById('product');
+                    productSelect.innerHTML = '<option value="">Produk tidak tersedia</option>';
+                });
+
+            document.getElementById('pulsaForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const phone = document.getElementById('phone').value;
+                const product = document.getElementById('product').value;
+
+                fetch('/api/beli-pulsa', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ phone, product })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Transaksi berhasil: ' + data.message);
+                })
+                .catch(error => {
+                    alert('Terjadi kesalahan: ' + error.message);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
